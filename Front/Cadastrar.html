@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon"
+    href="https://static.wikia.nocookie.net/mineminenomi/images/3/3b/Gomu_Gomu_no_Mi.png/revision/latest/thumbnail/width/360/height/360?cb=20231117144926"
+    type="image/jpg">
+  <title>Cadastrar - Mugiwara</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url('https://i.pinimg.com/736x/67/db/26/67db26921569188161bef8003f7d18f8.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: opacity 0.8s ease;
+    }
+
+    body.fade-out {
+      opacity: 0;
+    }
+
+    .register-container {
+      position: relative;
+      width: 90%;
+      max-width: 400px;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      z-index: 1;
+      overflow: hidden;
+      transition: box-shadow 0.5s ease;
+    }
+
+    .register-container::before {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      z-index: -1;
+      background: linear-gradient(45deg, gold, #fff9c4, gold, #ffecb3);
+      background-size: 200% 200%;
+      border-radius: 18px;
+      animation: border-glow 5s ease infinite;
+    }
+
+    .register-container:hover {
+      box-shadow: 0 0 25px 5px gold;
+    }
+
+    @keyframes border-glow {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    h4 {
+      color: rgb(124, 142, 20);
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group input {
+      width: 91%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #000001;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: blue;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .alert {
+      color: red;
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #777;
+    }
+
+    .footer a {
+      color: #4CAF50;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsividade para telas pequenas */
+    @media (max-width: 480px) {
+      .register-container {
+        padding: 20px;
+      }
+
+      h1,
+      h2 {
+        font-size: 20px;
+      }
+
+      button {
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      .input-group input {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      .footer {
+        font-size: 13px;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="register-container">
+    <h2>Cadastrar</h2>
+    <h4>Crie uma nova conta</h4>
+
+    <div class="input-group">
+      <input type="text" id="fullname" placeholder="Nome Completo" required>
+    </div>
+
+    <div class="input-group">
+      <input type="email" id="email" placeholder="E-mail" required>
+    </div>
+
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Senha" required>
+    </div>
+
+    <div class="input-group">
+      <input type="password" id="confirmPassword" placeholder="Confirmar Senha" required>
+    </div>
+
+    <button onclick="register()">Cadastrar</button>
+
+    <div id="alert" class="alert">Por favor, preencha todos os campos corretamente!</div>
+
+    <div class="footer">
+      <p>Já tem uma conta? <a href="javascript:void(0)" onclick="goToLogin()">Faça login</a></p>
+    </div>
+  </div>
+
+  <script>
+    async function register() {
+      const fullname = document.getElementById("fullname").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const confirmPassword = document.getElementById("confirmPassword").value.trim();
+      const alertDiv = document.getElementById("alert");
+
+      alertDiv.style.display = "none";
+
+      if (fullname && email && password && confirmPassword) {
+        if (password === confirmPassword) {
+          try {
+            const response = await fetch('http://localhost:5067/api/usuarios', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                nome: fullname,
+                email: email,
+                senha: password
+              })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              alert("Cadastro realizado com sucesso!");
+              window.location.href = "Login.html"; // Redireciona para a página de login após o cadastro
+            } else {
+              alertDiv.innerText = data.message || "Erro no cadastro";
+              alertDiv.style.display = "block";
+            }
+          } catch (error) {
+            alertDiv.innerText = "Erro ao conectar com o servidor.";
+            alertDiv.style.display = "block";
+            console.error(error);
+          }
+        } else {
+          alertDiv.style.display = "block";
+          alertDiv.textContent = "As senhas não coincidem!";
+        }
+      } else {
+        alertDiv.style.display = "block";
+        alertDiv.textContent = "Por favor, preencha todos os campos corretamente!";
+      }
+    }
+
+    function goToLogin() {
+      document.body.classList.add("fade-out");
+      setTimeout(() => {
+        window.location.href = "Login.html"; // Redireciona para a página de login
+      }, 800); // Tempo para a transição fade-out
+    }
+  </script>
+
+</body>
+
+</html>

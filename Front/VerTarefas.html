@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Tarefas - Mugiwara</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: darkblue;
+            height: 100vh;
+            display: flex;
+        }
+
+        .main-content h1 {
+            color: #fafafa;
+            /* Destaque no fundo azul escuro */
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sidebar {
+            background-color: #000000;
+            color: white;
+            padding: 20px;
+            width: 250px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .solicitar {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 30px;
+        }
+
+        nav li {
+            margin: 10px 0;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background-color: #ffffff;
+            /* Fundo atrás do título e dos botões */
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .status span {
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        .active {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .task-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            flex: 1 1 200px;
+            max-width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        button {
+            background-color: #008CBA;
+            border: none;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 14px;
+            margin-top: auto;
+        }
+
+        button:hover {
+            background-color: #005f7f;
+        }
+
+        /* Estilo para a área de tarefas concluídas */
+        .completed {
+            background-color: #e0f7e0;
+            text-decoration: line-through;
+        }
+
+        /* Estilo para as categorias de tarefas */
+        .on-time {
+            border-left: 5px solid green;
+        }
+
+        .at-risk {
+            border-left: 5px solid orange;
+        }
+
+        .late {
+            border-left: 5px solid red;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>
+                <button onclick="window.location.href = 'IniciarMenu.html'"
+                    style="all: unset; cursor: pointer; color: white; font-size: 24px;">
+                    Mugiwara
+                </button>
+            </h2>
+
+            <button class="solicitar">+ Solicitar</button>
+            <nav>
+                <ul>
+                    <li><a href="#">Minhas tarefas</a></li>
+                    <li><a href="#">Acompanhar</a></li>
+                    <li><a href="#">Finalizados</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1>Minhas tarefas</h1>
+            <div class="header">
+                <div class="status">
+                    <span class="all active">Todas</span>
+                    <span class="on-time">No Prazo</span>
+                    <span class="at-risk">Em Risco</span>
+                    <span class="late">Atrasadas</span>
+                </div>
+                <button class="filter">Filtro</button>
+            </div>
+
+            <div class="task-container">
+                <!-- As tarefas serão adicionadas dinamicamente aqui -->
+            </div>
+
+    </div>
+    </main>
+    <!-- Modal de criação de tarefa -->
+    <!-- Modal de criação de tarefa -->
+    <div id="taskModal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+        <div style="background:#fff; padding:20px; border-radius:8px; width:300px;">
+            <h3>Criar Nova Tarefa</h3>
+            <label>Título:</label>
+            <input type="text" id="taskTitle" style="width:100%; margin-bottom:10px;" />
+
+            <label>Descrição:</label>
+            <textarea id="taskDesc" style="width:100%; margin-bottom:10px;"></textarea>
+
+            <label>Prazo:</label>
+            <input type="date" id="taskDeadline" style="width:100%; margin-bottom:10px;" />
+
+            <button id="createTaskBtn">Criar</button>
+            <button onclick="document.getElementById('taskModal').style.display='none'">Cancelar</button>
+        </div>
+    </div>
+
+
+    </div>
+
+    <script>
+        // Abre o modal ao clicar em "+ Solicitar"
+        document.querySelector('.solicitar').addEventListener('click', function () {
+            document.getElementById('taskModal').style.display = 'flex';
+        });
+
+        // Função que atualiza os contadores do topo
+        function atualizarContadores() {
+            const all = document.querySelectorAll('.task-card').length;
+            const onTime = document.querySelectorAll('.task-card.on-time').length;
+            const atRisk = document.querySelectorAll('.task-card.at-risk').length;
+            const late = document.querySelectorAll('.task-card.late').length;
+
+            document.querySelector('.status .all').textContent = `Todas (${all})`;
+            document.querySelector('.status .on-time').textContent = `No Prazo (${onTime})`;
+            document.querySelector('.status .at-risk').textContent = `Em Risco (${atRisk})`;
+            document.querySelector('.status .late').textContent = `Atrasadas (${late})`;
+        }
+
+        // Função para formatar data corretamente (dd/mm/aaaa)
+        function formatarDataBR(dataISO) {
+            const partes = dataISO.split("-");
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        // Cria uma nova tarefa ao clicar no botão "Criar"
+        document.getElementById('createTaskBtn').addEventListener('click', function () {
+            const title = document.getElementById('taskTitle').value.trim();
+            const desc = document.getElementById('taskDesc').value.trim();
+            const deadlineInput = document.getElementById('taskDeadline').value;
+
+            if (!title || !deadlineInput) {
+                alert("Preencha o título e o prazo.");
+                return;
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Zera a hora para comparação precisa
+            const deadlineDate = new Date(deadlineInput + "T00:00:00");
+
+            let statusClass = 'on-time';
+            const diffDias = (deadlineDate - today) / (1000 * 60 * 60 * 24);
+
+            if (deadlineDate < today) {
+                statusClass = 'late';
+            } else if (diffDias <= 2) {
+                statusClass = 'at-risk';
+            }
+
+            const taskContainer = document.querySelector('.task-container');
+            const newTask = document.createElement('div');
+            newTask.className = `task-card ${statusClass}`;
+
+            const hojeFormatado = today.toLocaleDateString('pt-BR');
+            const prazoFormatado = formatarDataBR(deadlineInput);
+
+            newTask.innerHTML = `
+                <h3>${title}</h3>
+                <p>${desc || 'Sem descrição'}</p>
+                <p>Data: ${hojeFormatado}</p>
+                <p>Prazo: ${prazoFormatado}</p>
+                <button class="execute-btn">Executar</button>
+                <button class="details-btn">Detalhar</button>
+            `;
+
+            taskContainer.appendChild(newTask);
+
+            // Eventos dos botões
+            newTask.querySelector('.execute-btn').addEventListener('click', function () {
+                newTask.classList.toggle('completed');
+                this.textContent = newTask.classList.contains('completed') ? 'Desmarcar' : 'Executar';
+                alert('Tarefa ' + (newTask.classList.contains('completed') ? 'concluída' : 'em andamento'));
+            });
+
+            newTask.querySelector('.details-btn').addEventListener('click', function () {
+                alert('Detalhes da tarefa: ' + newTask.querySelector('h3').textContent);
+            });
+
+            // Limpa e fecha o modal
+            document.getElementById('taskModal').style.display = 'none';
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskDesc').value = '';
+            document.getElementById('taskDeadline').value = '';
+
+            // Atualiza os contadores
+            atualizarContadores();
+        });
+
+        // Filtrar tarefas ao clicar nos botões de status
+        document.querySelectorAll('.status span').forEach(button => {
+            button.addEventListener('click', function () {
+                document.querySelectorAll('.status span').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                const status = this.classList[0];
+                filterTasks(status);
+            });
+        });
+
+        function filterTasks(status) {
+            const tasks = document.querySelectorAll('.task-card');
+            tasks.forEach(task => {
+                if (status === 'all') {
+                    task.style.display = 'flex';
+                } else if (task.classList.contains(status)) {
+                    task.style.display = 'flex';
+                } else {
+                    task.style.display = 'none';
+                }
+            });
+        }
+
+        // Inicializa contadores ao carregar
+        atualizarContadores();
+    </script>
+
+    <script>
+        // Abre o modal ao clicar em "+ Solicitar"
+        document.querySelector('.solicitar').addEventListener('click', function () {
+            document.getElementById('taskModal').style.display = 'flex';
+        });
+
+        // Função para formatar data corretamente (dd/mm/aaaa)
+        function formatarDataBR(dataISO) {
+            const partes = dataISO.split("-");
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        // Função para criar uma nova tarefa
+        document.getElementById('createTaskBtn').addEventListener('click', function () {
+            const title = document.getElementById('taskTitle').value.trim();
+            const desc = document.getElementById('taskDesc').value.trim();
+            const deadlineInput = document.getElementById('taskDeadline').value;
+
+            if (!title || !deadlineInput) {
+                alert("Preencha o título e o prazo.");
+                return;
+            }
+
+            // Formatando a data
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Zera a hora para comparação precisa
+            const deadlineDate = new Date(deadlineInput + "T00:00:00");
+
+            // Define o status da tarefa (No prazo, Atrasada ou Em risco)
+            let statusClass = 'on-time';
+            const diffDias = (deadlineDate - today) / (1000 * 60 * 60 * 24);
+
+            if (deadlineDate < today) {
+                statusClass = 'late';
+            } else if (diffDias <= 2) {
+                statusClass = 'at-risk';
+            }
+
+            // Enviar a tarefa para a API
+            const taskData = {
+                Titulo: title,
+                Descricao: desc,
+                DataVencimento: deadlineInput,
+            };
+
+            // Enviando a tarefa para a API com fetch (ou você pode usar axios aqui)
+            fetch('http://localhost:5067/api/tarefas', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(taskData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Adicionar a nova tarefa na UI
+                    const taskContainer = document.querySelector('.task-container');
+                    const newTask = document.createElement('div');
+                    newTask.className = `task-card ${statusClass}`;
+
+                    const hojeFormatado = today.toLocaleDateString('pt-BR');
+                    const prazoFormatado = formatarDataBR(deadlineInput);
+
+                    newTask.innerHTML = `
+                <h3>${data.Titulo}</h3>
+                <p>${desc || 'Sem descrição'}</p>
+                <p>Data: ${hojeFormatado}</p>
+                <p>Prazo: ${prazoFormatado}</p>
+                <button class="execute-btn">Executar</button>
+                <button class="details-btn">Detalhar</button>
+            `;
+
+                    taskContainer.appendChild(newTask);
+
+                    // Eventos dos botões
+                    newTask.querySelector('.execute-btn').addEventListener('click', function () {
+                        newTask.classList.toggle('completed');
+                        this.textContent = newTask.classList.contains('completed') ? 'Desmarcar' : 'Executar';
+                        alert('Tarefa ' + (newTask.classList.contains('completed') ? 'concluída' : 'em andamento'));
+                    });
+
+                    newTask.querySelector('.details-btn').addEventListener('click', function () {
+                        alert('Detalhes da tarefa: ' + newTask.querySelector('h3').textContent);
+                    });
+
+                    // Limpa e fecha o modal
+                    document.getElementById('taskModal').style.display = 'none';
+                    document.getElementById('taskTitle').value = '';
+                    document.getElementById('taskDesc').value = '';
+                    document.getElementById('taskDeadline').value = '';
+
+                    // Atualiza os contadores
+                    atualizarContadores();
+                })
+                .catch(error => {
+                    console.error('Erro ao criar a tarefa:', error);
+                    alert('Erro ao criar a tarefa. Tente novamente mais tarde.');
+                });
+        });
+
+        // Função que atualiza os contadores do topo
+        function atualizarContadores() {
+            const all = document.querySelectorAll('.task-card').length;
+            const onTime = document.querySelectorAll('.task-card.on-time').length;
+            const atRisk = document.querySelectorAll('.task-card.at-risk').length;
+            const late = document.querySelectorAll('.task-card.late').length;
+
+            document.querySelector('.status .all').textContent = `Todas (${all})`;
+            document.querySelector('.status .on-time').textContent = `No Prazo (${onTime})`;
+            document.querySelector('.status .at-risk').textContent = `Em Risco (${atRisk})`;
+            document.querySelector('.status .late').textContent = `Atrasadas (${late})`;
+        }
+
+        // Filtrar tarefas ao clicar nos botões de status
+        document.querySelectorAll('.status span').forEach(button => {
+            button.addEventListener('click', function () {
+                document.querySelectorAll('.status span').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                const status = this.classList[0];
+                filterTasks(status);
+            });
+        });
+
+        function filterTasks(status) {
+            const tasks = document.querySelectorAll('.task-card');
+            tasks.forEach(task => {
+                if (status === 'all') {
+                    task.style.display = 'flex';
+                } else if (task.classList.contains(status)) {
+                    task.style.display = 'flex';
+                } else {
+                    task.style.display = 'none';
+                }
+            });
+        }
+
+        // Inicializa contadores ao carregar
+        atualizarContadores();
+    </script>
+
+</body>
+
+</html>
