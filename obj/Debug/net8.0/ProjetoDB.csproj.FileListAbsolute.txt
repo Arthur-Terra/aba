@@ -211,3 +211,4 @@ C:\Users\Aluno\Downloads\2-1\2\ProjetoDB\obj\Debug\net8.0\refint\ProjetoDB.dll
 C:\Users\Aluno\Downloads\2-1\2\ProjetoDB\obj\Debug\net8.0\ProjetoDB.pdb
 C:\Users\Aluno\Downloads\2-1\2\ProjetoDB\obj\Debug\net8.0\ProjetoDB.genruntimeconfig.cache
 C:\Users\Aluno\Downloads\2-1\2\ProjetoDB\obj\Debug\net8.0\ref\ProjetoDB.dll
+C:\Users\aluno\ProjetoDB\obj\Debug\net8.0\ProjetoDB.sourcelink.json

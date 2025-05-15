@@ -1,669 +1,143 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon"
-        href="https://static.wikia.nocookie.net/mineminenomi/images/3/3b/Gomu_Gomu_no_Mi.png/revision/latest/thumbnail/width/360/height/360?cb=20231117144926"
-        type="image/jpg">
-    <title>Mugiwara</title>
-
+    <title>Calendário e Gráfico</title>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
             margin: 0;
             padding: 0;
-            background-color: darkblue;
-            color: #fff;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
         }
 
-        .top-container {
+        header {
+            background-color: #3f51b5;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            padding: 40px 20px;
+        }
+
+        #calendar {
+            max-width: 900px;
             width: 100%;
-            height: 60px;
-            background-color: #000;
-            color: #ffcc00;
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            line-height: 60px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-            position: fixed;
-            top: 0;
-            z-index: 2;
-        }
-
-        .main-container {
-            display: flex;
-            flex-wrap: wrap;
-            margin-top: 60px;
-            flex: 1;
-            height: calc(100vh - 60px);
-            overflow-y: auto;
-        }
-
-        .left-container {
-            min-width: 180px;
-            width: 220px;
-            background-color: #1c1c3c;
-            padding: 20px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: transform 0.2s ease;
-        }
-
-        .menu-item:hover {
-            transform: scale(1.05);
-        }
-
-        .menu-label {
-            font-size: 16px;
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .img-button,
-        .profile-button {
-            width: 50px;
-            height: 50px;
-            background-size: cover;
-            background-position: center;
-            border-radius: 50%;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
-        }
-
-        .img-button {
-            background-color: #ffc107;
-            background-image: url('https://static.vecteezy.com/ti/vetor-gratis/p1/9795938-lupa-com-icone-de-olho-em-escrever-fundo-estilo-plano-lupa-e-sinal-de-olho-busca-simbolo-de-vidro-vetor.jpg');
-        }
-
-        .profile-button {
-            position: fixed;
-            top: 10px;
-            right: 20px;
-            background-image: url('https://www.planocritico.com/wp-content/uploads/2022/01/invencivel-vol-14-meio-plano-critico-1024x683.jpg');
-            border: 2px solid #ffcc00;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-            z-index: 3;
-        }
-
-        .content-wrapper {
-            flex: 1;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
+            background-color: white;
             padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .calendar-container {
-            flex: 2;
-            background-color: #fff;
-            color: #000;
-            border-radius: 10px;
+        #chartContainer {
+            max-width: 900px;
+            width: 100%;
+            background-color: white;
             padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            overflow: auto;
-            min-width: 280px;
-        }
-
-        .calendar-navigation {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .navigation-button {
-            background-color: #ff6347;
-            border: none;
-            color: white;
-            font-size: 18px;
-            padding: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .navigation-button:hover {
-            background-color: #e64a30;
-        }
-
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            margin-top: 10px;
-        }
-
-        .calendar div {
-            padding: 15px;
-            background-color: #f4f4f4;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-            transition: background-color 0.2s ease;
-        }
-
-        .calendar div:hover {
-            background-color: #ffd700;
-        }
-
-        .today {
-            background-color: #2196F3 !important;
-            color: white !important;
-        }
-
-        .holiday {
-            background-color: #DC3545 !important;
-            color: white !important;
-        }
-
-        .calendar-legend {
-            margin-top: 15px;
-            display: flex;
-            gap: 20px;
-            font-weight: bold;
-            font-size: 18px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .legend-box {
-            width: 40px;
-            height: 40px;
-            display: inline-block;
-            margin-right: 5px;
-            border-radius: 4px;
-        }
-
-        .legend-box.today {
-            background-color: #2196F3;
-        }
-
-        .legend-box.holiday {
-            background-color: #DC3545;
-        }
-
-        .dashboard {
-            flex: 1;
-            min-width: 350px;
-            max-width: 450px;
-            background-color: #1e1e3c;
-            border-radius: 0;
-            padding: 10px;
-            color: #fff;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .dropdown {
-            position: fixed;
-            top: 70px;
-            right: 30px;
-            background-color: #fff;
-            color: #000;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            width: 200px;
-            display: none;
-            flex-direction: column;
-            padding: 10px;
-            z-index: 3;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .dropdown a {
-            padding: 12px 10px;
-            color: #333;
-            text-decoration: none;
-            border-bottom: 1px solid #eee;
-            font-weight: 600;
+        canvas {
+            width: 100% !important;
+            height: 400px !important;
         }
 
-        .dropdown a:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown a:hover {
-            background-color: #f0f0f0;
-        }
-
-        .task-status-buttons {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .status-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
+        footer {
+            background-color: #3f51b5;
             color: white;
-            font-size: 16px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-            transition: background-color 0.2s ease;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 40px;
         }
 
-        .status-btn.pendente {
-            background-color: #ffcc00;
-        }
-
-        .status-btn.concluida {
-            background-color: #28a745;
-        }
-
-        .status-btn.atrasada {
-            background-color: #dc3545;
-        }
-
-        .status-btn:hover {
-            opacity: 0.85;
-        }
-
-        .circle-button.haki {
-            border: none;
-            border-radius: 30%;
-            padding: 10px 20px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-            color: black;
-        }
-
-        /* Cores iniciais por tipo */
-        .circle-button.haki.pendentes {
-            background-color: yellow;
-        }
-
-        .circle-button.haki.concluidas {
-            background-color: #28a745;
-        }
-
-        .circle-button.haki.atrasadas {
-            background-color: #dc3545;
-        }
-
-        /* Quando ativo */
-        .circle-button.haki.haki-active {
-            background-color: black !important;
-            color: white !important;
-            animation: hakiPulse 0.7s ease-in-out;
-        }
-
-        /* Animação */
-        @keyframes hakiPulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 10px #fff;
-            }
-
-            50% {
-                transform: scale(1.15);
-                box-shadow: 0 0 20px #ccc;
-            }
-
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 10px #fff;
-            }
-        }
-
-
-        .hide {
-            visibility: hidden;
-        }
-
-        @media (max-width: 900px) {
-            .content-wrapper {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .dashboard,
-            .calendar-container {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .left-container {
-                width: 100%;
+        @media (min-width: 1000px) {
+            main {
                 flex-direction: row;
+                align-items: flex-start;
                 justify-content: space-around;
-                padding: 10px;
-                gap: 10px;
             }
 
-            .menu-label {
-                display: none;
-            }
-
-            .dropdown {
-                right: 10px;
-                width: 90%;
+            #calendar, #chartContainer {
+                width: 45%;
             }
         }
     </style>
-
-
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
-<audio id="hakiSound" preload="auto">
-    <source src="https://cdn.pixabay.com/audio/2023/03/30/audio_b9298242ae.mp3" type="audio/mpeg">
-    Seu navegador não suporta o elemento de áudio.
-</audio>
-
 <body>
-    <div class="top-container">
-        Bem-vindo ao Sistema Mugiwara!
-    </div>
+    <header>
+        <h1>Calendário e Gráfico</h1>
+    </header>
 
-    <div class="main-container">
-        <div class="content-wrapper">
-            <div class="left-container">
-                <div class="menu-item">
-                    <a href="VerTarefas.html" class="menu-item">
-                        <div class="circle-button img-button"></div>
-                        <span class="menu-label">Ver Tarefas</span>
-                    </a>
-                </div>
-
-                <div class="circle-button">2</div>
-                <div class="circle-button">3</div>
-                <div class="circle-button">4</div>
-            </div>
-
-            <div class="calendar-container">
-                <div class="calendar-wrapper">
-                    <div class="calendar-navigation">
-                        <button class="navigation-button" onclick="navigateMonth(-1)">&#8592;</button>
-                        <span id="calendar-month-year">Abril 2025</span>
-                        <button class="navigation-button" onclick="navigateMonth(1)">&#8594;</button>
-                    </div>
-                    <div class="calendar"></div>
-                    <div class="calendar-legend">
-                        <button onclick="goToToday()"
-                            style="background:none;font-size: 18px;border:none;color:#2196F3;font-weight:bold;cursor:pointer;display:flex;align-items:center;gap:5px;">
-                            <span class="legend-box today"></span> Hoje
-                        </button>
-
-                        <span style="display: flex; align-items: center; gap: 5px;">
-                            <span class="legend-box holiday"></span> Feriado
-                        </span>
-                    </div>
-
-                    <div class="task-status-buttons">
-                        <button class="circle-button haki pendentes"
-                            onclick="filtroTarefas('pendente')">Pendentes</button>
-                        <button class="circle-button haki concluidas"
-                            onclick="filtroTarefas('concluida')">Concluídas</button>
-                        <button class="circle-button haki atrasadas"
-                            onclick="filtroTarefas('atrasada')">Atrasadas</button>
-                    </div>
-                </div>
-            </div>
+    <main>
+        <div id="calendar"></div>
+        <div id="chartContainer">
+            <canvas id="myChart"></canvas>
         </div>
+    </main>
 
-        <div class="dashboard">
-            <h4>Área de Dashboard - Aqui você pode adicionar widgets ou informações.</h4>
-            <canvas id="myPieChart" width="400" height="400"></canvas>
-        </div>
-    </div>
-
-    <!-- Botão de perfil -->
-    <div class="profile-button" onclick="toggleDropdown(event)"></div>
-
-    <!-- Dropdown principal -->
-    <div class="dropdown" id="profileDropdown">
-        <a href="#" onclick="showSwitchProfile(event)">Trocar Perfil</a>
-        <a href="Login.html">Sair</a>
-    </div>
-
-    <!-- Dropdown de troca de perfil -->
-    <div class="dropdown" id="switchProfileDropdown" style="display: none;">
-        <a href="#" onclick="backToMainDropdown(event)">&#8592;</a>
-        <div id="accountsList" style="padding: 10px 15px; color: #000000;">
-            <p>Conta 1</p>
-            <p>Conta 2</p>
-            <p>Conta 3</p>
-            <!-- Contas reais serão carregadas por API futuramente -->
-        </div>
-    </div>
+    <footer>
+        <p>&copy; 2025 Seu Nome. Todos os direitos reservados.</p>
+    </footer>
 
     <script>
-        const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-        let currentDate = new Date();
-
-        function updateCalendar() {
-            const month = currentDate.getMonth();
-            const year = currentDate.getFullYear();
-            document.getElementById('calendar-month-year').textContent = `${months[month]} ${year}`;
-            generateCalendar(month, year);
-        }
-
-        function navigateMonth(direction) {
-            currentDate.setMonth(currentDate.getMonth() + direction);
-            updateCalendar();
-        }
-
-        function generateCalendar(month, year) {
-            const firstDay = new Date(year, month, 1).getDay();
-            const lastDate = new Date(year, month + 1, 0).getDate();
-            const calendarDivs = document.querySelector('.calendar');
-            calendarDivs.innerHTML = '';
-
-            const today = new Date();
-            const todayDate = today.getDate();
-            const todayMonth = today.getMonth();
-            const todayYear = today.getFullYear();
-
-            const holidays = [
-                { day: 1, month: 0 }, { day: 21, month: 3 }, { day: 1, month: 4 }, { day: 7, month: 8 }, { day: 12, month: 9 },
-                { day: 2, month: 10 }, { day: 15, month: 10 }, { day: 25, month: 11 }
-            ];
-
-            ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].forEach(day => {
-                const div = document.createElement('div');
-                div.textContent = day;
-                div.style.fontWeight = 'bold';
-                calendarDivs.appendChild(div);
-            });
-
-            for (let i = 0; i < firstDay; i++) {
-                calendarDivs.appendChild(document.createElement('div'));
-            }
-
-            for (let i = 1; i <= lastDate; i++) {
-                const div = document.createElement('div');
-                div.textContent = i;
-                if (i === todayDate && month === todayMonth && year === todayYear) {
-                    div.classList.add('today');
-                }
-                if (holidays.some(h => h.day === i && h.month === month)) {
-                    div.classList.add('holiday');
-                }
-                calendarDivs.appendChild(div);
-            }
-        }
-
-        function goToToday() {
-            currentDate = new Date();
-            updateCalendar();
-        }
-    </script>
-
-    <script>
-        function toggleDropdown(event) {
-            event.stopPropagation();
-            const dropdown = document.getElementById('profileDropdown');
-            const switchDropdown = document.getElementById('switchProfileDropdown');
-
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-            switchDropdown.style.display = 'none';
-        }
-
-        function showSwitchProfile(event) {
-            event.preventDefault();
-            document.getElementById('profileDropdown').style.display = 'none';
-            document.getElementById('switchProfileDropdown').style.display = 'block';
-        }
-
-        function backToMainDropdown(event) {
-            event.preventDefault();
-            document.getElementById('switchProfileDropdown').style.display = 'none';
-            document.getElementById('profileDropdown').style.display = 'block';
-        }
-
-        document.addEventListener('click', function (event) {
-            const profileBtn = document.querySelector('.profile-button');
-            const dropdown = document.getElementById('profileDropdown');
-            const switchDropdown = document.getElementById('switchProfileDropdown');
-
-            if (!profileBtn.contains(event.target) && !dropdown.contains(event.target) && !switchDropdown.contains(event.target)) {
-                dropdown.style.display = 'none';
-                switchDropdown.style.display = 'none';
-            }
-        });
-    </script>
-
-    <script>
-        const API_URL = 'http://localhost:5067/api';
-        let usuarioSelecionado = null;
-        let myChart = null;
-
-        function carregarUsuarios() {
-            fetch(`${API_URL}/usuarios`)
-                .then(res => res.json())
-                .then(usuarios => {
-                    const accountsList = document.getElementById('accountsList');
-                    accountsList.innerHTML = '';
-                    usuarios.forEach(usuario => {
-                        const p = document.createElement('p');
-                        p.textContent = usuario.nome;
-                        p.style.cursor = 'pointer';
-                        p.onclick = () => selecionarUsuario(usuario);
-                        accountsList.appendChild(p);
-                    });
-                })
-                .catch(err => console.error('Erro ao buscar usuários:', err));
-        }
-
-        function selecionarUsuario(usuario) {
-            usuarioSelecionado = usuario;
-            carregarTarefas(usuario.id);
-            carregarGrafico(usuario.id);
-        }
-
-        function carregarTarefas(usuarioId) {
-            fetch(`${API_URL}/tarefas`)
-                .then(res => res.json())
-                .then(tarefas => {
-                    const tarefasDoUsuario = tarefas.filter(t => t.id_Usuario === usuarioId);
-                    console.log(`Tarefas do usuário ${usuarioId}:`, tarefasDoUsuario);
-                })
-                .catch(err => console.error('Erro ao buscar tarefas:', err));
-        }
-
-        function carregarGrafico(usuarioId) {
-            fetch(`${API_URL}/graficos/${usuarioId}`)
-                .then(res => res.json())
-                .then(data => {
-                    atualizarGrafico(data);
-                })
-                .catch(err => console.error('Erro ao buscar gráfico:', err));
-        }
-
-        function atualizarGrafico(data) {
-            const ctx = document.getElementById('myPieChart').getContext('2d');
-            if (myChart) myChart.destroy();
-            myChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Pendentes', 'Concluídas', 'Atrasadas'],
-                    datasets: [{
-                        data: [data.tarefas_Pendentes, data.tarefas_Concluidas, data.tarefas_Atrasadas],
-                        backgroundColor: ['yellow', '#28a745', '#dc3545'],
-                        borderColor: '#000',
-                        borderWidth: 1
-                    }]
+        document.addEventListener('DOMContentLoaded', function () {
+            let calendarEl = document.getElementById('calendar');
+            let calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'pt-br',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#fff',
-                                font: { size: 14 }
-                            }
-                        }
+                events: [
+                    {
+                        title: 'Evento 1',
+                        start: '2025-05-15'
+                    },
+                    {
+                        title: 'Evento 2',
+                        start: '2025-05-18'
+                    }
+                ]
+            });
+            calendar.render();
+        });
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio'],
+                datasets: [{
+                    label: 'Tarefas Concluídas',
+                    data: [12, 19, 3, 5, 2],
+                    backgroundColor: '#3f51b5'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Progresso Mensal de Tarefas'
                     }
                 }
-            });
-        }
-
-        carregarUsuarios();
+            }
+        });
     </script>
-
-    <script>
-        const hakiSound = document.getElementById('hakiSound');
-
-        hakiSound.addEventListener('canplaythrough', () => {
-            console.log('Áudio pronto para ser reproduzido');
-        });
-
-        hakiSound.addEventListener('error', (e) => {
-            console.error('Erro ao carregar o áudio:', e);
-        });
-
-        document.querySelectorAll('.circle-button.haki').forEach(button => {
-            button.addEventListener('click', () => {
-                // Alterna estado visual
-                button.classList.toggle('haki-active');
-
-                // Reinicia animação (caso você use uma futura animação CSS com .circle-animate)
-                button.classList.remove('circle-animate');
-                void button.offsetWidth;
-                button.classList.add('circle-animate');
-
-                // Reproduz som
-                if (hakiSound.readyState >= 2) {
-                    hakiSound.currentTime = 0;
-                    hakiSound.play().catch(error => console.error("Erro ao tocar o som:", error));
-                }
-            });
-        });
-
-    </script>
-
-
 </body>
-
-
-
 </html>
